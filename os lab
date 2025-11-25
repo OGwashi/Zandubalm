@@ -227,6 +227,7 @@ printf("\nAvg WT: %.2f", avgWT / n);
 printf("\nAvg TAT: %.2f\n", avgTAT / n);
 getch();
 }
+
 1d)Round robin
 #include <stdio.h>
 void findWaitingTime(int n, int bt[], int wt[], int quantum)
@@ -631,5 +632,30 @@ void main() {
 int pages[] = {1, 2, 3, 2, 1, 4, 2, 3};
 clrscr();
 printf("Page Faults: %d\n", lfu(pages, sizeof(pages) / sizeof(pages[0]), 3));
+getch();
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <dos.h>
+void childProcess() {
+printf("Child process.\n");
+delay(1000);
+}
+void parentProcess() {
+printf("Parent process.\n");
+childProcess();
+}
+void executeCommand(const char *command) {
+printf("Command: %s\n", command);
+system(command);
+}
+void main() {
+clrscr();
+printf("Simulating fork(), wait(), exec(), exit() in DOS.\n");
+parentProcess();
+executeCommand("dir");
+printf("Exiting program.\n");
+exit(0);
 getch();
 }
