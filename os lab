@@ -659,3 +659,274 @@ printf("Exiting program.\n");
 exit(0);
 getch();
 }
+
+
+Linux:
+
+1.PRIME OR NOT
+
+#!/bin/bash
+read  -p "Enter a number: " n
+if [ "$n" -le 1 ]; then
+    echo "$n is not a prime number."
+    exit
+fi
+if [ "$n" -eq 2 ]; then
+    echo "2 is a prime number."
+    exit
+fi
+if [ $((n % 2)) -eq 0 ]; then
+    echo "$n is not a prime number."
+    exit
+fi
+i=3
+while [ $((i * i)) -le "$n" ]; do
+    if [ $((n % i)) –eq 0 ]; then
+        echo "$n is not a prime number."
+        exit
+    fi
+    i=$((i + 2))
+done
+echo "$n is a prime number."
+
+ OUTPUT:
+-bash-4.1$ bash raj.sh
+Enter a number: 26
+26 is not a prime number.
+
+2.FIBONACCI SERIES
+
+#!/bin/bash
+echo "enter the range:"
+read range
+a=0
+b=1
+echo "Fibonacci series upto $range: "
+echo -n "$a "
+while [ $b -le $range ]
+do
+   echo -n "$b "
+   temp=$b
+   b=$((a+b))
+   a=$temp
+done
+echo
+
+OUTPUT:
+-bash-4.1$ bash 42.sh
+enter the range:
+6
+Fibonacci series upto 6:
+0 1 1 2 3 5
+
+3.ARMSTONG NUMBER OR NOT
+
+#!/bin/bash
+echo -n "Enter a number: "
+read num
+n=$num
+sum=0
+while [ $n -gt 0 ]
+do
+    digit=$(( n % 10 ))
+    sum=$(( sum + digit*digit*digit ))
+    n=$(( n / 10 ))
+done
+if [ $sum -eq $num ]; then
+    echo "$num is an Armstrong number"
+else
+    echo "$num is not an Armstrong number"
+fi
+
+OUTPUT:
+-bash-4.1$ bash shyam.sh
+Enter a number: 32
+32 is not an Armstrong number
+
+
+4..MARKS
+
+#!/bin/bash
+echo "Enter Student Number:"
+read sno
+echo "Enter Student Name:"
+read sname
+echo "Enter marks in 5 subjects (separated by space):"
+read m1 m2 m3 m4 m5
+# Calculate total
+total=$((m1 + m2 + m3 + m4 + m5))
+# Calculate percentage (out of 500)
+percentage=$((total * 100 / 500))
+echo "-----------------------------"
+echo "Student Number : $sno"
+echo "Student Name   : $sname"
+echo "Marks in 5 Subjects: $m1 $m2 $m3 $m4 $m5"
+echo "Total Marks    : $total"
+echo "Percentage     : $percentage%"
+echo "-----------------------------"
+
+OUTPUT:
+-bash-4.1$ bash  marks.sh
+Enter Student Number:
+101
+Enter Student Name:
+JOHN
+Enter marks in 5 subjects (separated by space):
+65 78 86 96 85
+-----------------------------
+Student Number : 101
+Student Name   : JOHN
+Marks in 5 Subjects: 65 78 86 96 85
+Total Marks    : 410
+Percentage     : 82%
+-----------------------------
+
+5.GRADE
+#!/bin/bash
+
+echo "Enter marks of 5 subjects:"
+read s1 s2 s3 s4 s5
+
+# Calculate total
+total=$((s1 + s2 + s3 + s4 + s5))
+
+# Calculate average
+avg=$((total / 5))
+
+echo "Total = $total"
+echo "Average = $avg"
+
+# Determine Grade
+if [ $avg -ge 80 ]; then
+    grade="A"
+elif [ $avg -ge 70 ]; then
+    grade="B"
+elif [ $avg -ge 60 ]; then
+    grade="C"
+elif [ $avg -ge 50 ]; then
+    grade="D"
+elif [ $avg -ge 40 ]; then
+    grade="E"
+else
+    grade="Fail"
+fi
+
+echo "Grade = $grade"
+
+OUTPUT:
+Enter marks of 5 subjects:
+85 96 75 98 68
+Total = 422
+Average = 84
+Grade = A
+
+6.MIN AND MAX NUMBER
+
+#!/bin/bash
+echo "Enter numbers separated by space:"
+read -a arr     # read input into an array
+# Initialize min and max with the first element
+min=${arr[0]}
+max=${arr[0]}
+# Loop through all elements
+for num in "${arr[@]}"
+do
+    if [ $num -lt $min ]; then
+        min=$num
+    fi
+    if [ $num -gt $max ]; then
+        max=$num
+    fi
+done
+echo "Minimum value: $min"
+echo "Maximum value: $max"
+
+OUTPUT:
+-bash-4.1$ bash shyamu.sh
+Enter numbers separated by space:
+20  52
+Minimum value: 20
+Maximum value: 52
+
+
+7.PALINDROME
+
+#!/bin/bash
+echo "Enter a string:"
+read str
+# Reverse the string
+rev_str=$(echo "$str" | rev)
+# Compare original with reversed
+if [ "$str" = "$rev_str" ]; then
+    echo "\"$str\" is a palindrome"
+else
+    echo "\"$str\" is NOT a palindrome"
+fi
+
+OUTPUT:
+Enter a string:
+system
+"system" is NOT a palindrome
+
+8.AWK PROGRAM 
+
+-bash-4.1$ vi stum2.txt
+lavanya 30 100 200 250 300 400
+satya 25 300 390 450 670 340
+ lasya 35 400 700 500 320 210
+
+-bash-4.1$ vi stum2.awk
+
+{
+    name = $1
+    roll = $2
+    sum = 0
+    for(i=3; i<=7; i++) {
+        sum += $i
+    }
+    avg = sum / 5
+    printf "Name: %s, Roll No: %s, Total Marks = %d, Average = %.2f\n", name, roll, sum, avg
+}
+
+OUTPUT:
+
+-bash-4.1$ awk -f stum2.awk stum2.txt
+Name: , Roll No: , Total Marks = 0, Average = 0.00
+Name: lavanya, Roll No: 30, Total Marks = 1250, Average = 250.00
+Name: satya, Roll No: 25, Total Marks = 2150, Average = 430.00
+Name: lasya, Roll No: 35, Total Marks = 2130, Average = 426.00
+Name: , Roll No: , Total Marks = 0, Average = 0.00
+
+9.COUNT
+
+#!/bin/bash
+echo "Enter filename:"
+read file
+
+n=1
+while read line
+do
+    words=$(echo "$line" | wc -w)
+    chars=$(echo "$line" | wc -c)
+    echo "Line $n: Words = $words, Characters = $chars"
+    n=$((n+1))
+done < "$file"
+
+OUTPUT:
+
+1)hello.c
+Line 1: Words = 1, Characters = 18
+Line 2: Words = 0, Characters = 1
+Line 3: Words = 2, Characters = 11
+Line 4: Words = 1, Characters = 2
+Line 5: Words = 2, Characters = 23
+Line 6: Words = 2, Characters = 10
+Line 7: Words = 1, Characters = 2
+Line 8: Words = 0, Characters = 1
+
+2)pal.sh
+Line 1: Words = 1, Characters = 12
+Line 2: Words = 3, Characters = 20
+
+
+
