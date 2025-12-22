@@ -1,0 +1,410 @@
+1)prime:
+set serveroutput on
+DECLARE
+    n NUMBER := &num;
+    c NUMBER := 0;
+BEGIN
+    FOR i IN 1..n LOOP
+        IF MOD(n, i) = 0 THEN c := c + 1; END IF;
+    END LOOP;
+
+    IF c = 2 THEN
+        DBMS_OUTPUT.PUT_LINE('Prime');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Not Prime');
+    END IF;
+END;
+/
+
+2)explicit cursor:
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+    CURSOR c1 IS SELECT 1 num FROM dual;
+    v_num NUMBER;
+BEGIN
+    OPEN c1;
+    FETCH c1 INTO v_num;
+    DBMS_OUTPUT.PUT_LINE('Value: ' || v_num);
+    CLOSE c1;
+END;
+/
+
+3)sum of odd up to n;
+DECLARE
+    n NUMBER := &n; s NUMBER := 0;
+BEGIN
+    FOR i IN 1..n LOOP
+        IF MOD(i,2)=1 THEN s:=s+i; END IF;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE(s);
+END;
+/
+
+4)sum of even
+
+DECLARE
+    n NUMBER := &n; s NUMBER := 0;
+BEGIN
+    FOR i IN 1..n LOOP
+        IF MOD(i,2)=0 THEN s:=s+i; END IF;
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE(s);
+END;
+/
+
+5)notational parameters
+SET SERVEROUTPUT ON;
+
+DECLARE
+    PROCEDURE add_nums(a IN NUMBER, b IN NUMBER) IS
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Sum = ' || (a + b));
+    END;
+BEGIN
+    -- Calling procedure using notational parameters
+    add_nums(b => 10, a => 5);
+END;
+/
+
+6)tigger for cheking age
+
+CREATE OR REPLACE TRIGGER trg_check_age
+BEFORE INSERT OR UPDATE ON customer
+FOR EACH ROW
+BEGIN
+    IF :NEW.age < 18 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Age must be 18 or above');
+    END IF;
+END;
+/
+
+7)raising exception
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+    age NUMBER := &age;
+    invalid_age EXCEPTION;
+BEGIN
+    IF age < 18 THEN
+        RAISE invalid_age;
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE('Valid Age');
+EXCEPTION
+    WHEN invalid_age THEN
+        DBMS_OUTPUT.PUT_LINE('Age must be 18 or above');
+END;
+/
+
+8)greatest of 3 numbers
+set serveroutput on;
+declare
+a number:=&a;
+b number:=&b;
+c number:=&c;
+begin
+if(a>b AND a>c) then 
+dbms_output.put_line('a is big' || a);
+elsif(b>c) then 
+dbms_output.put_line('b is big' || b);
+else
+dbms_output.put_line('c is big' || c);
+end if;
+end;
+/
+
+9)add of 2 numbers
+
+set serveroutput on;
+declare
+a number:=&a;
+b number:=&b;
+c number;
+begin
+c:=(a+b);
+dbms_output.put_line(sum);
+end;
+/
+
+10)given number is even or odd
+
+set serveroutput onl=;
+declare
+a number :=&a;
+begin
+if mod(a,2)=0 then 
+dbms_output.put_line('a is even');
+else
+dbms_output.put_line('a is odd');
+end if;
+end;
+/
+
+
+11)positional parameters
+
+create or replace procedure find_square(
+  n in number,
+  result out number
+  )
+  is
+  begin
+  result :=n*n;
+  end;
+  /
+
+declare
+  ans number;
+  BEGIN
+  find_square(5,ans);
+  dbms_output.put_line('square ='||ans);
+  end;
+  /
+
+12)GCD:
+
+create or replace procedure gcd(
+ num1 in number,
+ num2 in number,
+ gcd_result out number) as
+ n1 number:=num1;
+ n2 number:=num2;
+ r number;
+ begin
+ while mod(n2,n1)!=0 loop
+ r:=mod(n2,n1);
+ n2:=n1;
+ n1:=r;
+ end loop;
+ gcd_result:=n1;
+ end;
+ /
+
+ declare
+  v_num1 number :=&v_num1;
+  v_num2 number :=&v_num2;
+  v_result number;
+  begin
+  gcd(v_num1,v_num2,v_result);
+  dbms_output.put_line('GCD of'||v_num1||'and'||v_num2||':'||v_result);
+  end;
+  /
+
+13)NUM is positive,negative or zero:
+
+declare 
+a number:=&a;
+begin 
+if (a>0) then
+ dbms_output.put_line('a is possitive');
+elsif (a<0) then
+ dbms_output.put_line('a is negative');
+else 
+  dbms_output.put_line('a is 0');
+end if;
+end;
+/
+
+14)User defined exception:
+
+declare
+
+age number:=&age;
+invalid_age EXCEPTION;
+begin
+
+if (age<18) then
+ raise invalid_age;
+else
+  dbms_output.put_line('Eligible');
+end if;
+
+exception
+  when invalid_age then
+  dbms_output.put_line('not Eligible');
+ end;
+/
+ 
+
+15)factorial:
+CREATE OR REPLACE FUNCTION fact(n IN NUMBER)
+RETURN NUMBER
+IS
+   f NUMBER := 1;
+   i NUMBER;
+BEGIN
+   FOR i IN 1..n LOOP
+      f := f * i;
+   END LOOP;
+
+   RETURN f;
+END;
+/
+
+DECLARE
+   result NUMBER:=&result;
+BEGIN
+   result := fact(result);
+   DBMS_OUTPUT.PUT_LINE('Factorial = ' || result);
+END;
+/
+
+16)minimum of three numbers using if statements:
+
+declare 
+a number :=&a;
+b number :=&b;
+c number :=&c;
+
+begin
+
+if(a<b and a<c)  then
+dbms_output.put_line('a is smallest');
+elsif(b<a and b<c) then
+dbms_output.put_line('b is smallest');
+else 
+dbms_output.put_line('c is smallest');
+end if;
+end;
+/
+
+17)Trigger to raise appropriate error code and message:
+
+CREATE TABLE emp (
+   empno NUMBER,
+   ename VARCHAR2(20),
+   salary NUMBER
+);
+
+
+CREATE OR REPLACE TRIGGER trg_check_salary
+BEFORE INSERT OR UPDATE ON emp
+FOR EACH ROW
+BEGIN
+   IF :NEW.salary < 0 THEN
+      RAISE_APPLICATION_ERROR(
+         -20001,
+         'Salary cannot be negative'
+      );
+   END IF;
+END;
+/
+
+18)searching address:
+
+fetch address:
+ADDRESS
+-------------------------
+aid
+name
+street
+city
+state
+pincode
+
+
+DECLARE
+   v_street address.street%TYPE;
+   v_city   address.city%TYPE;
+BEGIN
+   SELECT street, city
+   INTO v_street, v_city
+   FROM address
+   WHERE aid = 101;
+
+   DBMS_OUTPUT.PUT_LINE('Street: ' || v_street);
+   DBMS_OUTPUT.PUT_LINE('City: ' || v_city);
+END;
+/
+
+19)avg of numbers from i to 100:
+
+declare 
+
+a number:=&a;
+c number;
+begin
+c:=(1+a)/2;
+
+ DBMS_OUTPUT.PUT_LINE('average is'||c);
+end;
+/
+
+20) DML triggers:
+
+CREATE TABLE emp (
+   empno NUMBER,
+   ename VARCHAR2(20),
+   salary NUMBER
+);
+
+CREATE OR REPLACE TRIGGER trg_all_dml
+BEFORE INSERT OR UPDATE OR DELETE ON emp
+BEGIN
+   IF INSERTING THEN
+      RAISE_APPLICATION_ERROR(
+         -20001,
+         'INSERT operation is not allowed on EMP table'
+      );
+
+   ELSIF UPDATING THEN
+      RAISE_APPLICATION_ERROR(
+         -20002,
+         'UPDATE operation is not allowed on EMP table'
+      );
+
+   ELSIF DELETING THEN
+      RAISE_APPLICATION_ERROR(
+         -20003,
+         'DELETE operation is not allowed on EMP table'
+      );
+   END IF;
+END;
+/
+21) predefined exceptions:
+
+DECLARE
+   a NUMBER := 10;
+   b NUMBER := 0;
+   v_name emp.ename%TYPE;
+
+   invalid_salary EXCEPTION;   -- user-defined exception
+BEGIN
+   -- ZERO_DIVIDE
+   DBMS_OUTPUT.PUT_LINE(a / b);
+
+   -- NO_DATA_FOUND / TOO_MANY_ROWS
+   SELECT ename INTO v_name
+   FROM emp
+   WHERE empno = 999;
+
+   -- User-defined exception
+   IF a < 0 THEN
+      RAISE invalid_salary;
+   END IF;
+
+EXCEPTION
+   WHEN ZERO_DIVIDE THEN
+      DBMS_OUTPUT.PUT_LINE('Error: Division by zero');
+
+   WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.PUT_LINE('Error: No data found');
+
+   WHEN TOO_MANY_ROWS THEN
+      DBMS_OUTPUT.PUT_LINE('Error: Too many rows');
+
+   WHEN DUP_VAL_ON_INDEX THEN
+      DBMS_OUTPUT.PUT_LINE('Error: Duplicate value');
+
+   WHEN invalid_salary THEN
+      DBMS_OUTPUT.PUT_LINE('Error: Invalid salary');
+
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.PUT_LINE(
+         'Unknown Error: ' || SQLCODE || ' - ' || SQLERRM
+      );
+END;
+/
