@@ -928,5 +928,57 @@ Line 8: Words = 0, Characters = 1
 Line 1: Words = 1, Characters = 12
 Line 2: Words = 3, Characters = 20
 
+UNIX
 
+1) Emulate ls -l
+SOURCE CODE:
+#include <stdio.h>
+#include <dir.h>
+void main() {
+    struct ffblk f;
+    int d, yr, mo, dy;
+    d = findfirst("*.*", &f, FA_DIREC | FA_ARCH | FA_RDONLY | FA_HIDDEN);
+    while (!d) {
+        yr = (f.ff_fdate >> 9) + 1980;
+        mo = (f.ff_fdate >> 5) & 15;
+        dy = f.ff_fdate & 31;
+        printf("%c%c%c\t%8ld\t%02d-%02d-%d\t%s\n",
+            (f.ff_attrib & FA_DIREC) ? 'd' : '-',
+            (f.ff_attrib & FA_RDONLY) ? 'r' : 'w',
+            (f.ff_attrib & FA_HIDDEN) ? 'h' : '-',
+            f.ff_fsize, dy, mo, yr, f.ff_name);
+        d = findnext(&f);
+    }
+}
 
+OUTPUT:
+dw-           0	15-10-2024	INCLUDE
+-w-         512	22-12-2025	NONAME00.C
+-w-       12050	01-11-2023	PROJECT.EXE
+-r-        2048	05-01-2022	README.TXT
+dw-           0	10-09-2024	BIN
+-wh         128	12-08-2024	SECRET.LOG
+
+2) 2 commands concurrently with a command pipe
+SOURCE CODE:
+#include<stdio.h>
+#include<stdlib.h>
+void main()
+{
+clrscr();
+system("dir | sort");
+//system("ls -l | sort");
+getch();
+}
+
+OUTPUT:
+2 Dir(s)  20,450,050,123 bytes free
+               3 File(s)         15,400 bytes
+ Directory of C:\TURBOC3\SOURCE
+ Volume Serial Number is A1B2-C3D4
+ Volume in drive C has no label.
+10-05-2025  09:30 AM               512 INPUT.C
+11-15-2025  02:15 PM            12,050 OUTPUT.EXE
+12-22-2025  11:11 AM    <DIR>          .
+12-22-2025  11:11 AM    <DIR>          ..
+12-22-2025  11:12 AM             2,838 SORT.C
