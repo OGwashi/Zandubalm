@@ -635,32 +635,6 @@ printf("Page Faults: %d\n", lfu(pages, sizeof(pages) / sizeof(pages[0]), 3));
 getch();
 }
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <dos.h>
-void childProcess() {
-printf("Child process.\n");
-delay(1000);
-}
-void parentProcess() {
-printf("Parent process.\n");
-childProcess();
-}
-void executeCommand(const char *command) {
-printf("Command: %s\n", command);
-system(command);
-}
-void main() {
-clrscr();
-printf("Simulating fork(), wait(), exec(), exit() in DOS.\n");
-parentProcess();
-executeCommand("dir");
-printf("Exiting program.\n");
-exit(0);
-getch();
-}
-
-
 Linux:
 
 1.PRIME OR NOT
