@@ -1,0 +1,2004 @@
+CREATE TABLE Authors (
+Author_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Books (
+Book_ID NUMBER PRIMARY KEY,
+Book_Title VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0),
+Author_ID NUMBER,
+FOREIGN KEY (Author_ID) REFERENCES Authors(Author_ID)
+);
+CREATE TABLE Sales (
+Sale_ID NUMBER PRIMARY KEY,
+Book_ID NUMBER,
+Sale_Date DATE NOT NULL,
+Quantity_Sold NUMBER CHECK (Quantity_Sold &gt; 0),
+FOREIGN KEY (Book_ID) REFERENCES Books(Book_ID)
+);
+-- Demonstrating constraint violations
+-- This will fail due to NOT NULL constraint
+INSERT INTO Authors (Author_ID) VALUES (1);
+-- This will fail due to CHECK constraint (Price &gt; 0)
+INSERT INTO Books VALUES (1, 'Sample Book', -10, 1);
+-- This will fail due to FOREIGN KEY constraint
+INSERT INTO Books VALUES (2, 'Another Book', 50, 999);
+-- This will fail due to CHECK constraint (Quantity_Sold &gt; 0)
+INSERT INTO Sales VALUES (1, 1, SYSDATE, -5);
+INSERT INTO Authors VALUES (1, 'J.K. Rowling');
+INSERT INTO Authors VALUES (2, 'George Orwell');
+INSERT INTO Authors VALUES (3, 'Jane Austen');
+INSERT INTO Books VALUES (1, 'Harry Potter', 25, 1);
+INSERT INTO Books VALUES (2, '1984', 15, 2);
+INSERT INTO Books VALUES (3, 'Pride and Prejudice', 30, 3);
+INSERT INTO Books VALUES (4, 'Animal Farm', 22, 2);
+MCA-I Semester DBMS Lab Exam - Complete Solutions
+All 20 Question Sets with SQL Code
+SET 1: Authors-Books-Sales
+Question 1: Schema Creation and Queries
+Create Tables with Constraints
+Sample Data Insertion
+INSERT INTO Sales VALUES (1, 1, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 30);
+INSERT INTO Sales VALUES (2, 1, TO_DATE('2024-02-20', 'YYYY-MM-DD'), 25);
+INSERT INTO Sales VALUES (3, 3, TO_DATE('2024-03-10', 'YYYY-MM-DD'), 40);
+INSERT INTO Sales VALUES (4, 4, TO_DATE('2024-04-05', 'YYYY-MM-DD'), 15);
+COMMIT;
+SELECT DISTINCT a.Name
+FROM Authors a
+JOIN Books b ON a.Author_ID = b.Author_ID
+WHERE b.Price &gt; 20;
+SELECT b.Book_Title, SUM(s.Quantity_Sold) AS Total_Quantity
+FROM Books b
+JOIN Sales s ON b.Book_ID = s.Book_ID
+GROUP BY b.Book_Title
+ORDER BY Total_Quantity DESC;
+SELECT a.Name
+FROM Authors a
+JOIN Books b ON a.Author_ID = b.Author_ID
+JOIN Sales s ON b.Book_ID = s.Book_ID
+GROUP BY a.Name
+HAVING SUM(s.Quantity_Sold) &gt; 50;
+-- 1. Display Book_Title in uppercase
+SELECT UPPER(Book_Title) AS Uppercase_Title
+FROM Books;
+-- 2. Calculate length of book title
+SELECT Book_Title, LENGTH(Book_Title) AS Title_Length
+FROM Books;
+-- 3. Retrieve current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+greatest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+greatest := num1;
+ELSIF num2 &gt;= num1 AND num2 &gt;= num3 THEN
+greatest := num2;
+Query 1: Authors with books priced > 20
+Query 2: Total quantity sold per book
+Query 3: Authors who sold more than 50 books
+Question 2: String and Date Functions
+Question 3: Greatest of Three Numbers (PL/SQL)
+ELSE
+greatest := num3;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The greatest number is: ' || greatest);
+END;
+/
+CREATE OR REPLACE PROCEDURE Calculate_GCD(
+num1 IN NUMBER,
+num2 IN NUMBER,
+gcd OUT NUMBER
+) IS
+a NUMBER := num1;
+b NUMBER := num2;
+temp NUMBER;
+BEGIN
+WHILE b != 0 LOOP
+temp := b;
+b := MOD(a, b);
+a := temp;
+END LOOP;
+gcd := a;
+DBMS_OUTPUT.PUT_LINE('GCD of ' || num1 || ' and ' || num2 || ' is: ' || gcd);
+END;
+/
+-- Execute the procedure
+DECLARE
+result NUMBER;
+BEGIN
+Calculate_GCD(48, 18, result);
+END;
+/
+CREATE TABLE Employees (
+Employee_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Position VARCHAR2(50) NOT NULL,
+Salary NUMBER CHECK (Salary &gt; 0)
+);
+CREATE TABLE Departments (
+Department_ID NUMBER PRIMARY KEY,
+Department_Name VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Employee_Department (
+Employee_ID NUMBER,
+Department_ID NUMBER,
+Start_Date DATE NOT NULL,
+FOREIGN KEY (Employee_ID) REFERENCES Employees(Employee_ID),
+Question 4: GCD Procedure
+SET 2: Employees-Departments-Employee_Department
+Question 1: Schema Creation and Queries
+Create Tables
+FOREIGN KEY (Department_ID) REFERENCES Departments(Department_ID)
+);
+-- Sample data
+INSERT INTO Employees VALUES (101, 'Alice Smith', 'Manager', 75000);
+INSERT INTO Employees VALUES (102, 'Bob Johnson', 'Developer', 55000);
+INSERT INTO Employees VALUES (103, 'Charlie Brown', 'Developer', 60000);
+INSERT INTO Employees VALUES (104, 'David Lee', 'Analyst', 48000);
+INSERT INTO Employees VALUES (105, 'Emma Davis', 'Tester', 45000);
+INSERT INTO Departments VALUES (1, 'IT');
+INSERT INTO Departments VALUES (2, 'HR');
+INSERT INTO Departments VALUES (3, 'Finance');
+INSERT INTO Employee_Department VALUES (101, 1, TO_DATE('2020-01-15', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (102, 1, TO_DATE('2021-03-20', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (103, 1, TO_DATE('2021-06-10', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (104, 3, TO_DATE('2022-02-01', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (105, 1, TO_DATE('2023-05-15', 'YYYY-MM-DD'));
+COMMIT;
+SELECT Name, Position
+FROM Employees
+WHERE Salary &gt; 50000;
+UPDATE Employees
+SET Salary = 75000
+WHERE Employee_ID = 105;
+COMMIT;
+SELECT e.Name
+FROM Employees e
+WHERE e.Employee_ID IN (
+SELECT ed.Employee_ID
+FROM Employee_Department ed
+GROUP BY ed.Department_ID
+HAVING COUNT(ed.Employee_ID) &gt; 10
+);
+-- 1. Lowercase employee names
+SELECT LOWER(Name) AS Lowercase_Name
+FROM Employees;
+-- 2. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 3. Length of employee names
+Query 1: Employees earning > 50000
+Query 2: Update salary for Employee 105
+Query 3: Employees in departments with > 10 employees
+Question 2: String and Date Functions
+SELECT Name, LENGTH(Name) AS Name_Length
+FROM Employees;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+largest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+largest := num1;
+ELSIF num2 &gt;= num1 AND num2 &gt;= num3 THEN
+largest := num2;
+ELSE
+largest := num3;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The largest number is: ' || largest);
+END;
+/
+CREATE OR REPLACE PROCEDURE Implicit_Cursor_Demo IS
+v_count NUMBER;
+BEGIN
+UPDATE Employees
+SET Salary = Salary * 1.1
+WHERE Position = 'Developer';
+v_count := SQL%ROWCOUNT;
+IF SQL%FOUND THEN
+DBMS_OUTPUT.PUT_LINE(v_count || ' employees updated successfully');
+ELSE
+DBMS_OUTPUT.PUT_LINE('No employees found with position Developer');
+END IF;
+COMMIT;
+END;
+/
+-- Execute
+BEGIN
+Implicit_Cursor_Demo;
+END;
+/
+Question 3: Largest of Three Numbers
+Question 4: Implicit Cursor Procedure
+SET 3: Patients-Doctors-Appointments
+CREATE TABLE Patients (
+Patient_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+DOB DATE NOT NULL
+);
+CREATE TABLE Doctors (
+Doctor_ID NUMBER PRIMARY KEY,
+Doctor_Name VARCHAR2(100) NOT NULL,
+Specialization VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Appointments (
+Appointment_ID NUMBER PRIMARY KEY,
+Patient_ID NUMBER,
+Doctor_ID NUMBER,
+Appointment_Date DATE NOT NULL,
+FOREIGN KEY (Patient_ID) REFERENCES Patients(Patient_ID),
+FOREIGN KEY (Doctor_ID) REFERENCES Doctors(Doctor_ID)
+);
+-- Sample data
+INSERT INTO Patients VALUES (1, 'John Miller', TO_DATE('1985-05-20', 'YYYY-MM-DD'));
+INSERT INTO Patients VALUES (2, 'Sarah Wilson', TO_DATE('1990-08-15', 'YYYY-MM-DD'));
+INSERT INTO Patients VALUES (3, 'Mike Taylor', TO_DATE('1978-12-03', 'YYYY-MM-DD'));
+INSERT INTO Doctors VALUES (101, 'Dr. Smith', 'Cardiology');
+INSERT INTO Doctors VALUES (102, 'Dr. Johnson', 'Orthopedics');
+INSERT INTO Doctors VALUES (103, 'Dr. Brown', 'Cardiology');
+INSERT INTO Appointments VALUES (1, 1, 101, TO_DATE('2024-11-20', 'YYYY-MM-DD'));
+INSERT INTO Appointments VALUES (2, 2, 102, TO_DATE('2024-11-21', 'YYYY-MM-DD'));
+INSERT INTO Appointments VALUES (3, 3, 103, TO_DATE('2024-11-22', 'YYYY-MM-DD'));
+COMMIT;
+SELECT Doctor_Name
+FROM Doctors
+WHERE Specialization = 'Cardiology';
+UPDATE Doctors
+SET Specialization = 'Neurologist'
+WHERE Doctor_ID = 102;
+COMMIT;
+Question 1: Schema Creation and Queries
+Create Tables
+Query 1: Doctors specializing in Cardiology
+Query 2: Update specialization
+SELECT DISTINCT p.Name
+FROM Patients p
+JOIN Appointments a ON p.Patient_ID = a.Patient_ID
+JOIN Doctors d ON a.Doctor_ID = d.Doctor_ID
+WHERE d.Specialization = 'Orthopedics';
+-- Add Salary column for demo
+ALTER TABLE Doctors ADD Salary NUMBER;
+UPDATE Doctors SET Salary = 95432.567;
+-- 1. Round salary to 2 decimal places
+SELECT Doctor_Name, ROUND(Salary, 2) AS Rounded_Salary
+FROM Doctors;
+-- 2. Length of patient name
+SELECT Name, LENGTH(Name) AS Name_Length
+FROM Patients;
+-- 3. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+total NUMBER := 0;
+i NUMBER;
+BEGIN
+FOR i IN 1..100 LOOP
+IF MOD(i, 2) = 0 THEN
+total := total + i;
+END IF;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of even numbers from 1 to 100: ' || total);
+END;
+/
+CREATE OR REPLACE FUNCTION Calculate_Factorial(n IN NUMBER) RETURN NUMBER IS
+result NUMBER := 1;
+BEGIN
+IF n &lt; 0 THEN
+RETURN NULL;
+ELSIF n = 0 OR n = 1 THEN
+RETURN 1;
+ELSE
+FOR i IN 2..n LOOP
+result := result * i;
+END LOOP;
+RETURN result;
+END IF;
+END;
+/
+Query 3: Patients with Orthopedics appointments
+Question 2: Functions
+Question 3: Sum of Even Numbers 1-100
+Question 4: Factorial Function and Procedure
+CREATE OR REPLACE PROCEDURE Factorial_Procedure(num IN NUMBER) IS
+fact NUMBER;
+BEGIN
+fact := Calculate_Factorial(num);
+DBMS_OUTPUT.PUT_LINE('Factorial of ' || num || ' is: ' || fact);
+END;
+/
+-- Execute
+BEGIN
+Factorial_Procedure(5);
+END;
+/
+CREATE TABLE Clients (
+Client_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Phone VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Projects (
+Project_ID NUMBER PRIMARY KEY,
+Project_Name VARCHAR2(200) NOT NULL,
+Budget NUMBER CHECK (Budget &gt; 0)
+);
+CREATE TABLE Project_Assignments (
+Assignment_ID NUMBER PRIMARY KEY,
+Client_ID NUMBER,
+Project_ID NUMBER,
+Start_Date DATE NOT NULL,
+FOREIGN KEY (Client_ID) REFERENCES Clients(Client_ID),
+FOREIGN KEY (Project_ID) REFERENCES Projects(Project_ID)
+);
+-- Sample data
+INSERT INTO Clients VALUES (1, 'ABC Corp', '555-1234');
+INSERT INTO Clients VALUES (2, 'XYZ Ltd', '555-5678');
+INSERT INTO Clients VALUES (3, 'Global Inc', '555-9012');
+INSERT INTO Projects VALUES (1, 'Website Redesign', 60000);
+INSERT INTO Projects VALUES (2, 'Mobile App', 80000);
+INSERT INTO Projects VALUES (3, 'Database Migration', 45000);
+INSERT INTO Project_Assignments VALUES (1, 1, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'));
+INSERT INTO Project_Assignments VALUES (2, 1, 2, TO_DATE('2024-02-15', 'YYYY-MM-DD'));
+INSERT INTO Project_Assignments VALUES (3, 2, 1, TO_DATE('2024-03-20', 'YYYY-MM-DD'));
+INSERT INTO Project_Assignments VALUES (4, 3, 2, TO_DATE('2024-04-05', 'YYYY-MM-DD'));
+COMMIT;
+SET 4: Clients-Projects-Project_Assignments
+Question 1: Schema Creation and Queries
+Create Tables
+SELECT DISTINCT c.Name
+FROM Clients c
+JOIN Project_Assignments pa ON c.Client_ID = pa.Client_ID
+JOIN Projects p ON pa.Project_ID = p.Project_ID
+WHERE p.Budget &gt; 50000;
+SELECT p.Project_Name, SUM(p.Budget) AS Total_Budget
+FROM Projects p
+GROUP BY p.Project_Name
+ORDER BY Total_Budget ASC;
+SELECT c.Name
+FROM Clients c
+JOIN Project_Assignments pa ON c.Client_ID = pa.Client_ID
+GROUP BY c.Name
+HAVING COUNT(pa.Project_ID) &gt; 1;
+-- 1. Trim spaces from project names
+SELECT TRIM(Project_Name) AS Trimmed_Name
+FROM Projects;
+-- 2. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 3. Client names in uppercase
+SELECT UPPER(Name) AS Uppercase_Name
+FROM Clients;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+greatest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+greatest := num1;
+ELSIF num2 &gt;= num1 AND num2 &gt;= num3 THEN
+greatest := num2;
+ELSE
+greatest := num3;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The greatest number is: ' || greatest);
+END;
+/
+Query 1: Clients with projects budget > 50000
+Query 2: Total budget per project
+Query 3: Clients assigned to > 1 project
+Question 2: String Functions
+Question 3: Greatest of Three Numbers
+CREATE TABLE Address_DB (
+Address_ID NUMBER PRIMARY KEY,
+Street VARCHAR2(200),
+City VARCHAR2(100),
+State VARCHAR2(50),
+ZipCode VARCHAR2(10)
+);
+INSERT INTO Address_DB VALUES (1, '123 Main St', 'New York', 'NY', '10001');
+INSERT INTO Address_DB VALUES (2, '456 Oak Ave', 'Los Angeles', 'CA', '90001');
+INSERT INTO Address_DB VALUES (3, '789 Pine Rd', 'Chicago', 'IL', '60601');
+COMMIT;
+CREATE OR REPLACE FUNCTION Search_Address(search_city IN VARCHAR2)
+RETURN VARCHAR2 IS
+v_address VARCHAR2(500);
+BEGIN
+SELECT Street || ', ' || City || ', ' || State || ' ' || ZipCode
+INTO v_address
+FROM Address_DB
+WHERE UPPER(City) = UPPER(search_city)
+AND ROWNUM = 1;
+RETURN v_address;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+RETURN 'Address not found';
+WHEN OTHERS THEN
+RETURN 'Error occurred';
+END;
+/
+-- Test the function
+BEGIN
+DBMS_OUTPUT.PUT_LINE(Search_Address('Chicago'));
+END;
+/
+CREATE TABLE Suppliers (
+Supplier_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Phone VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Items (
+Item_ID NUMBER PRIMARY KEY,
+Item_Name VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0)
+);
+CREATE TABLE Purchases (
+Purchase_ID NUMBER PRIMARY KEY,
+Supplier_ID NUMBER,
+Question 4: Search Address Function
+SET 5: Suppliers-Items-Purchases
+Question 1: Schema Creation and Queries
+Create Tables
+Item_ID NUMBER,
+Purchase_Date DATE NOT NULL,
+FOREIGN KEY (Supplier_ID) REFERENCES Suppliers(Supplier_ID),
+FOREIGN KEY (Item_ID) REFERENCES Items(Item_ID)
+);
+-- Sample data
+INSERT INTO Suppliers VALUES (1, 'Tech Supplies Inc', '555-1111');
+INSERT INTO Suppliers VALUES (2, 'Office Depot', '555-2222');
+INSERT INTO Suppliers VALUES (3, 'Global Traders', '555-3333');
+INSERT INTO Items VALUES (1, 'Laptop', 150);
+INSERT INTO Items VALUES (2, 'Mouse', 80);
+INSERT INTO Items VALUES (3, 'Keyboard', 120);
+INSERT INTO Items VALUES (4, 'Monitor', 90);
+INSERT INTO Purchases VALUES (1, 1, 1, TO_DATE('2024-01-15', 'YYYY-MM-DD'));
+INSERT INTO Purchases VALUES (2, 1, 3, TO_DATE('2024-02-20', 'YYYY-MM-DD'));
+INSERT INTO Purchases VALUES (3, 2, 1, TO_DATE('2024-03-10', 'YYYY-MM-DD'));
+INSERT INTO Purchases VALUES (4, 3, 2, TO_DATE('2024-04-05', 'YYYY-MM-DD'));
+COMMIT;
+SELECT DISTINCT s.Name
+FROM Suppliers s
+JOIN Purchases p ON s.Supplier_ID = p.Supplier_ID
+JOIN Items i ON p.Item_ID = i.Item_ID
+WHERE i.Price &gt; 100;
+SELECT s.Name, COUNT(p.Purchase_ID) AS Total_Purchases
+FROM Suppliers s
+JOIN Purchases p ON s.Supplier_ID = p.Supplier_ID
+GROUP BY s.Name
+ORDER BY Total_Purchases DESC;
+UPDATE Items
+SET Price = 150
+WHERE Item_ID = 10;
+COMMIT;
+-- 1. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 2. Concatenate supplier name and phone
+SELECT CONCAT(CONCAT(Name, ' - '), Phone) AS Supplier_Contact
+FROM Suppliers;
+-- 3. Round prices to nearest whole number
+Query 1: Suppliers with items priced > 100
+Query 2: Total purchases per supplier
+Query 3: Update item price
+Question 2: Functions
+SELECT Item_Name, ROUND(Price, 0) AS Rounded_Price
+FROM Items;
+DECLARE
+start_range NUMBER := &amp;start_num;
+end_range NUMBER := &amp;end_num;
+total NUMBER := 0;
+i NUMBER;
+BEGIN
+FOR i IN start_range..end_range LOOP
+IF MOD(i, 2) = 0 THEN
+total := total + i;
+END IF;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of even numbers from ' || start_range ||
+' to ' || end_range || ': ' || total);
+END;
+/
+CREATE TABLE DML_Log (
+Log_ID NUMBER PRIMARY KEY,
+Table_Name VARCHAR2(50),
+Operation VARCHAR2(20),
+Operation_Time TIMESTAMP,
+User_Name VARCHAR2(50)
+);
+CREATE SEQUENCE log_seq START WITH 1;
+CREATE OR REPLACE TRIGGER Items_DML_Trigger
+AFTER INSERT OR UPDATE OR DELETE ON Items
+FOR EACH ROW
+BEGIN
+IF INSERTING THEN
+INSERT INTO DML_Log VALUES (
+log_seq.NEXTVAL,
+'ITEMS',
+'INSERT',
+SYSTIMESTAMP,
+USER
+);
+DBMS_OUTPUT.PUT_LINE('INSERT operation performed on Items table');
+ELSIF UPDATING THEN
+INSERT INTO DML_Log VALUES (
+log_seq.NEXTVAL,
+'ITEMS',
+'UPDATE',
+SYSTIMESTAMP,
+USER
+);
+DBMS_OUTPUT.PUT_LINE('UPDATE operation performed on Items table');
+ELSIF DELETING THEN
+INSERT INTO DML_Log VALUES (
+log_seq.NEXTVAL,
+'ITEMS',
+'DELETE',
+SYSTIMESTAMP,
+Question 3: Sum of Even Numbers in Range
+Question 4: DML Operations Trigger
+USER
+);
+DBMS_OUTPUT.PUT_LINE('DELETE operation performed on Items table');
+END IF;
+END;
+/
+-- Test the trigger
+INSERT INTO Items VALUES (5, 'Printer', 200);
+UPDATE Items SET Price = 210 WHERE Item_ID = 5;
+DELETE FROM Items WHERE Item_ID = 5;
+-- Check log
+SELECT * FROM DML_Log;
+CREATE TABLE Authors (
+Author_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Country VARCHAR2(50) NOT NULL
+);
+CREATE TABLE Books (
+Book_ID NUMBER PRIMARY KEY,
+Book_Title VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0),
+Author_ID NUMBER,
+FOREIGN KEY (Author_ID) REFERENCES Authors(Author_ID)
+);
+CREATE TABLE Sales (
+Sale_ID NUMBER PRIMARY KEY,
+Book_ID NUMBER,
+Sale_Date DATE NOT NULL,
+Quantity_Sold NUMBER CHECK (Quantity_Sold &gt; 0),
+FOREIGN KEY (Book_ID) REFERENCES Books(Book_ID)
+);
+-- Sample data
+INSERT INTO Authors VALUES (1, 'Ernest Hemingway', 'USA');
+INSERT INTO Authors VALUES (2, 'Gabriel Garcia Marquez', 'Colombia');
+INSERT INTO Authors VALUES (3, 'Haruki Murakami', 'Japan');
+INSERT INTO Books VALUES (1, 'The Old Man and the Sea', 18, 1);
+INSERT INTO Books VALUES (2, 'One Hundred Years of Solitude', 25, 2);
+INSERT INTO Books VALUES (3, 'Norwegian Wood', 22, 3);
+INSERT INTO Books VALUES (4, 'A Farewell to Arms', 20, 1);
+INSERT INTO Sales VALUES (1, 2, TO_DATE('2024-01-10', 'YYYY-MM-DD'), 60);
+INSERT INTO Sales VALUES (2, 3, TO_DATE('2024-02-15', 'YYYY-MM-DD'), 55);
+INSERT INTO Sales VALUES (3, 2, TO_DATE('2024-03-20', 'YYYY-MM-DD'), 50);
+INSERT INTO Sales VALUES (4, 4, TO_DATE('2022-12-15', 'YYYY-MM-DD'), 30);
+COMMIT;
+SET 6: Authors-Books-Sales (Variant)
+Question 1: Schema Creation and Queries
+Create Tables
+SELECT DISTINCT b.Book_Title
+FROM Books b
+JOIN Sales s ON b.Book_ID = s.Book_ID
+WHERE s.Quantity_Sold &gt; 50;
+DELETE FROM Sales
+WHERE Sale_Date &lt; TO_DATE('2023-01-01', 'YYYY-MM-DD');
+COMMIT;
+SELECT a.Name
+FROM Authors a
+JOIN Books b ON a.Author_ID = b.Author_ID
+JOIN Sales s ON b.Book_ID = s.Book_ID
+GROUP BY a.Name
+HAVING SUM(s.Quantity_Sold) &gt; 100;
+-- 1. Length of book titles
+SELECT Book_Title, LENGTH(Book_Title) AS Title_Length
+FROM Books;
+-- 2. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 3. Book titles in uppercase
+SELECT UPPER(Book_Title) AS Uppercase_Title
+FROM Books;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+greatest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+greatest := num1;
+ELSE
+IF num2 &gt;= num3 THEN
+greatest := num2;
+ELSE
+greatest := num3;
+END IF;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The greatest number is: ' || greatest);
+END;
+/
+Query 1: Books sold with quantity > 50
+Query 2: Delete sales before Jan 1, 2023
+Query 3: Authors with books sold > 100 units
+Question 2: Functions
+Question 3: Greatest of Three Numbers
+CREATE OR REPLACE PROCEDURE Calculate_GCD(num1 IN NUMBER, num2 IN NUMBER) IS
+a NUMBER := num1;
+b NUMBER := num2;
+temp NUMBER;
+gcd NUMBER;
+BEGIN
+WHILE b != 0 LOOP
+temp := b;
+b := MOD(a, b);
+a := temp;
+END LOOP;
+gcd := a;
+DBMS_OUTPUT.PUT_LINE('GCD of ' || num1 || ' and ' || num2 || ' is: ' || gcd);
+END;
+/
+-- Execute
+BEGIN
+Calculate_GCD(56, 98);
+END;
+/
+CREATE TABLE Employees (
+Employee_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Position VARCHAR2(50) NOT NULL,
+Salary NUMBER CHECK (Salary &gt; 0)
+);
+CREATE TABLE Departments (
+Department_ID NUMBER PRIMARY KEY,
+Department_Name VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Employee_Department (
+Employee_ID NUMBER,
+Department_ID NUMBER,
+Start_Date DATE NOT NULL,
+FOREIGN KEY (Employee_ID) REFERENCES Employees(Employee_ID),
+FOREIGN KEY (Department_ID) REFERENCES Departments(Department_ID)
+);
+-- Sample data
+INSERT INTO Employees VALUES (101, 'Alice Johnson', 'Manager', 80000);
+INSERT INTO Employees VALUES (102, 'Bob Smith', 'Developer', 65000);
+INSERT INTO Employees VALUES (103, 'Charlie Davis', 'Manager', 85000);
+INSERT INTO Employees VALUES (104, 'Diana Wilson', 'Analyst', 55000);
+INSERT INTO Departments VALUES (1, 'Engineering');
+INSERT INTO Departments VALUES (2, 'Sales');
+INSERT INTO Employee_Department VALUES (101, 1, TO_DATE('2020-01-10', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (102, 1, TO_DATE('2021-05-15', 'YYYY-MM-DD'));
+Question 4: GCD Procedure
+SET 7: Employees-Departments (Variant)
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Employee_Department VALUES (103, 2, TO_DATE('2019-08-20', 'YYYY-MM-DD'));
+COMMIT;
+SELECT Name, Position
+FROM Employees
+ORDER BY Name ASC;
+UPDATE Employees
+SET Salary = Salary * 1.10
+WHERE Position = 'Manager';
+COMMIT;
+SELECT e.Name
+FROM Employees e
+WHERE e.Employee_ID IN (
+SELECT ed.Employee_ID
+FROM Employee_Department ed
+WHERE ed.Department_ID = (
+SELECT Department_ID
+FROM Employee_Department
+WHERE Employee_ID = 102
+)
+AND ed.Employee_ID != 102
+);
+-- 1. Trim spaces from names
+SELECT TRIM(Name) AS Trimmed_Name
+FROM Employees;
+-- 2. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 3. Names in uppercase
+SELECT UPPER(Name) AS Uppercase_Name
+FROM Employees;
+DECLARE
+given_number NUMBER := &amp;input_number;
+total NUMBER := 0;
+i NUMBER;
+BEGIN
+FOR i IN 1..given_number LOOP
+IF MOD(i, 2) = 0 THEN
+total := total + i;
+END IF;
+Query 1: List employees sorted by name
+Query 2: Increase Manager salary by 10%
+Query 3: Employees in same department as Employee 102
+Question 2: Functions
+Question 3: Sum of Even Numbers
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of even numbers from 1 to ' ||
+given_number || ': ' || total);
+END;
+/
+ALTER TABLE Employees ADD DOB DATE;
+CREATE OR REPLACE TRIGGER Check_Age_Trigger
+BEFORE INSERT OR UPDATE ON Employees
+FOR EACH ROW
+DECLARE
+v_age NUMBER;
+BEGIN
+IF :NEW.DOB IS NOT NULL THEN
+v_age := FLOOR(MONTHS_BETWEEN(SYSDATE, :NEW.DOB) / 12);
+IF v_age &lt; 18 THEN
+RAISE_APPLICATION_ERROR(-20001, 'Age must be at least 18 years');
+ELSIF v_age &gt; 65 THEN
+RAISE_APPLICATION_ERROR(-20002, 'Age cannot exceed 65 years');
+END IF;
+END IF;
+END;
+/
+-- Test the trigger
+INSERT INTO Employees VALUES (105, 'Test Employee', 'Tester', 40000,
+TO_DATE('2010-01-01', 'YYYY-MM-DD'));
+CREATE TABLE Customers (
+Customer_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Phone VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Products (
+Product_ID NUMBER PRIMARY KEY,
+Product_Name VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0)
+);
+CREATE TABLE Orders (
+Order_ID NUMBER PRIMARY KEY,
+Customer_ID NUMBER,
+Product_ID NUMBER,
+Order_Date DATE NOT NULL,
+FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID),
+FOREIGN KEY (Product_ID) REFERENCES Products(Product_ID)
+);
+Question 4: Age Validation Trigger
+SET 8: Customers-Products-Orders
+Question 1: Schema Creation and Queries
+Create Tables
+-- Sample data
+INSERT INTO Customers VALUES (1, 'John Doe', '555-1234');
+INSERT INTO Customers VALUES (2, 'Jane Smith', '555-5678');
+INSERT INTO Customers VALUES (3, 'Bob Brown', '555-9012');
+INSERT INTO Products VALUES (1, 'Laptop', 120);
+INSERT INTO Products VALUES (2, 'Smartphone', 80);
+INSERT INTO Products VALUES (3, 'Tablet', 150);
+INSERT INTO Products VALUES (4, 'Headphones', 60);
+INSERT INTO Orders VALUES (1, 1, 1, TO_DATE('2024-01-15', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (2, 1, 3, TO_DATE('2024-02-20', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (3, 2, 1, TO_DATE('2024-03-10', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (4, 3, 2, TO_DATE('2024-04-05', 'YYYY-MM-DD'));
+COMMIT;
+SELECT DISTINCT c.Name, c.Phone
+FROM Customers c
+JOIN Orders o ON c.Customer_ID = o.Customer_ID
+JOIN Products p ON o.Product_ID = p.Product_ID
+WHERE p.Price &gt; 100;
+SELECT c.Name, COUNT(o.Order_ID) AS Total_Orders
+FROM Customers c
+JOIN Orders o ON c.Customer_ID = o.Customer_ID
+GROUP BY c.Name
+ORDER BY Total_Orders DESC;
+SELECT DISTINCT c.Name
+FROM Customers c
+JOIN Orders o ON c.Customer_ID = o.Customer_ID
+JOIN Products p ON o.Product_ID = p.Product_ID
+WHERE p.Price BETWEEN 50 AND 200;
+-- 1. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 2. Concatenate name and phone
+SELECT CONCAT(CONCAT(Name, ' - '), Phone) AS Customer_Contact
+FROM Customers;
+-- 3. Round prices
+SELECT Product_Name, ROUND(Price, 0) AS Rounded_Price
+FROM Products;
+Query 1: Customers with orders > 100
+Query 2: Total orders per customer
+Query 3: Customers with products priced 50-200
+Question 2: Functions
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+minimum NUMBER;
+BEGIN
+IF num1 &lt;= num2 AND num1 &lt;= num3 THEN
+minimum := num1;
+ELSIF num2 &lt;= num1 AND num2 &lt;= num3 THEN
+minimum := num2;
+ELSE
+minimum := num3;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The minimum number is: ' || minimum);
+END;
+/
+CREATE OR REPLACE TRIGGER Product_Price_Check
+BEFORE INSERT OR UPDATE ON Products
+FOR EACH ROW
+BEGIN
+IF :NEW.Price &lt;= 0 THEN
+RAISE_APPLICATION_ERROR(-20003, 'Error: Product price must be greater than 0');
+ELSIF :NEW.Price &gt; 100000 THEN
+RAISE_APPLICATION_ERROR(-20004, 'Error: Product price exceeds maximum limit');
+END IF;
+END;
+/
+-- Test
+INSERT INTO Products VALUES (5, 'Expensive Item', -50);
+INSERT INTO Products VALUES (6, 'Super Expensive', 150000);
+CREATE TABLE Authors (
+Author_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Nationality VARCHAR2(50) NOT NULL
+);
+CREATE TABLE Books (
+Book_ID NUMBER PRIMARY KEY,
+Title VARCHAR2(200) NOT NULL,
+Genre VARCHAR2(50) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0),
+Author_ID NUMBER,
+FOREIGN KEY (Author_ID) REFERENCES Authors(Author_ID)
+);
+Question 3: Minimum of Three Numbers
+Question 4: Trigger with Error Handling
+SET 9: Authors-Books-Purchases
+Question 1: Schema Creation and Queries
+Create Tables
+CREATE TABLE Purchases (
+Purchase_ID NUMBER PRIMARY KEY,
+Customer_ID NUMBER NOT NULL,
+Book_ID NUMBER,
+Purchase_Date DATE NOT NULL,
+Customer_Nationality VARCHAR2(50) NOT NULL,
+FOREIGN KEY (Book_ID) REFERENCES Books(Book_ID)
+);
+-- Sample data
+INSERT INTO Authors VALUES (1, 'Mark Twain', 'American');
+INSERT INTO Authors VALUES (2, 'Leo Tolstoy', 'Russian');
+INSERT INTO Authors VALUES (3, 'Agatha Christie', 'British');
+INSERT INTO Books VALUES (1, 'Adventures of Huckleberry Finn', 'Fiction', 55, 1);
+INSERT INTO Books VALUES (2, 'War and Peace', 'Historical', 65, 2);
+INSERT INTO Books VALUES (3, 'Murder on the Orient Express', 'Mystery', 45, 3);
+INSERT INTO Purchases VALUES (1, 101, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'), 'American');
+INSERT INTO Purchases VALUES (2, 102, 2, TO_DATE('2024-02-15', 'YYYY-MM-DD'), 'Russian');
+INSERT INTO Purchases VALUES (3, 103, 1, TO_DATE('2024-03-20', 'YYYY-MM-DD'), 'American');
+COMMIT;
+SELECT DISTINCT a.Name
+FROM Authors a
+JOIN Books b ON a.Author_ID = b.Author_ID
+WHERE b.Price &gt; 50;
+SELECT b.Genre, COUNT(p.Purchase_ID) AS Total_Purchases
+FROM Books b
+JOIN Purchases p ON b.Book_ID = p.Book_ID
+GROUP BY b.Genre
+ORDER BY Total_Purchases DESC;
+SELECT DISTINCT b.Title
+FROM Books b
+JOIN Purchases p ON b.Book_ID = p.Book_ID
+WHERE p.Customer_Nationality = 'American';
+-- 1. Uppercase customer names (add column first)
+ALTER TABLE Purchases ADD Customer_Name VARCHAR2(100);
+UPDATE Purchases SET Customer_Name = 'John Smith';
+SELECT UPPER(Customer_Name) AS Uppercase_Name
+FROM Purchases;
+-- 2. Trim book titles
+SELECT TRIM(Title) AS Trimmed_Title
+FROM Books;
+Query 1: Authors with books priced > 50
+Query 2: Total books per genre
+Query 3: Books purchased by American customers
+Question 2: Functions
+-- 3. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+total NUMBER := 0;
+average NUMBER;
+i NUMBER;
+BEGIN
+FOR i IN 1..100 LOOP
+total := total + i;
+END LOOP;
+average := total / 100;
+DBMS_OUTPUT.PUT_LINE('Average of numbers from 1 to 100: ' || average);
+END;
+/
+CREATE OR REPLACE FUNCTION Factorial_Function(n IN NUMBER) RETURN NUMBER IS
+result NUMBER := 1;
+BEGIN
+IF n &lt; 0 THEN
+RETURN NULL;
+ELSIF n = 0 OR n = 1 THEN
+RETURN 1;
+ELSE
+FOR i IN 2..n LOOP
+result := result * i;
+END LOOP;
+RETURN result;
+END IF;
+END;
+/
+CREATE OR REPLACE PROCEDURE Compute_Factorial(num IN NUMBER) IS
+fact NUMBER;
+BEGIN
+fact := Factorial_Function(num);
+IF fact IS NULL THEN
+DBMS_OUTPUT.PUT_LINE('Factorial is not defined for negative numbers');
+ELSE
+DBMS_OUTPUT.PUT_LINE('Factorial of ' || num || ' is: ' || fact);
+END IF;
+END;
+/
+-- Execute
+BEGIN
+Compute_Factorial(6);
+END;
+/
+Question 3: Average of Numbers 1-100
+Question 4: Factorial Function and Procedure
+CREATE TABLE Departments (
+Department_ID NUMBER PRIMARY KEY,
+Department_Name VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Employees (
+Employee_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Salary NUMBER CHECK (Salary &gt; 0)
+);
+CREATE TABLE Assignments (
+Assignment_ID NUMBER PRIMARY KEY,
+Employee_ID NUMBER,
+Department_ID NUMBER,
+Start_Date DATE NOT NULL,
+FOREIGN KEY (Employee_ID) REFERENCES Employees(Employee_ID),
+FOREIGN KEY (Department_ID) REFERENCES Departments(Department_ID)
+);
+-- Sample data
+INSERT INTO Departments VALUES (1, 'IT');
+INSERT INTO Departments VALUES (2, 'HR');
+INSERT INTO Departments VALUES (3, 'Finance');
+INSERT INTO Employees VALUES (101, 'Alice Brown', 50000);
+INSERT INTO Employees VALUES (102, 'Bob Green', 42000);
+INSERT INTO Employees VALUES (103, 'Charlie White', 48000);
+INSERT INTO Employees VALUES (104, 'Diana Black', 38000);
+INSERT INTO Employees VALUES (105, 'Eve Gray', 45000);
+INSERT INTO Assignments VALUES (1, 101, 1, TO_DATE('2020-01-15', 'YYYY-MM-DD'));
+INSERT INTO Assignments VALUES (2, 102, 2, TO_DATE('2021-03-20', 'YYYY-MM-DD'));
+INSERT INTO Assignments VALUES (3, 103, 1, TO_DATE('2021-06-10', 'YYYY-MM-DD'));
+INSERT INTO Assignments VALUES (4, 104, 3, TO_DATE('2022-02-01', 'YYYY-MM-DD'));
+INSERT INTO Assignments VALUES (5, 105, 1, TO_DATE('2023-05-15', 'YYYY-MM-DD'));
+COMMIT;
+SELECT Name
+FROM Employees
+WHERE Salary &gt; 40000;
+UPDATE Employees
+SET Salary = 75000
+WHERE Employee_ID = 105;
+COMMIT;
+SET 10: Departments-Employees-Assignments
+Question 1: Schema Creation and Queries
+Create Tables
+Query 1: Employees earning > 40000
+Query 2: Update salary for Employee 105
+SELECT e.Name
+FROM Employees e
+WHERE e.Employee_ID IN (
+SELECT a.Employee_ID
+FROM Assignments a
+GROUP BY a.Department_ID
+HAVING COUNT(a.Employee_ID) &gt; 10
+);
+-- 1. Concatenate employee and department names
+SELECT CONCAT(CONCAT(e.Name, ' - '), d.Department_Name) AS Employee_Dept
+FROM Employees e
+JOIN Assignments a ON e.Employee_ID = a.Employee_ID
+JOIN Departments d ON a.Department_ID = d.Department_ID;
+-- 2. Length of names
+SELECT Name, LENGTH(Name) AS Name_Length
+FROM Employees;
+-- 3. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+total NUMBER := 0;
+i NUMBER;
+BEGIN
+FOR i IN 1..100 LOOP
+IF MOD(i, 2) != 0 THEN
+total := total + i;
+END IF;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of odd numbers from 1 to 100: ' || total);
+END;
+/
+CREATE TABLE Employee_Audit (
+Audit_ID NUMBER PRIMARY KEY,
+Employee_ID NUMBER,
+Old_Salary NUMBER,
+New_Salary NUMBER,
+Change_Date TIMESTAMP
+);
+CREATE SEQUENCE audit_seq START WITH 1;
+CREATE OR REPLACE TRIGGER Update_Audit_Trigger
+AFTER UPDATE ON Employees
+FOR EACH ROW
+BEGIN
+INSERT INTO Employee_Audit VALUES (
+Query 3: Employees in departments with > 10 employees
+Question 2: Functions
+Question 3: Sum of Odd Numbers 1-100
+Question 4: Cascade Update Trigger
+audit_seq.NEXTVAL,
+:NEW.Employee_ID,
+:OLD.Salary,
+:NEW.Salary,
+SYSTIMESTAMP
+);
+END;
+/
+-- Test
+UPDATE Employees SET Salary = 52000 WHERE Employee_ID = 101;
+SELECT * FROM Employee_Audit;
+CREATE TABLE Customer (
+Customer_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Email VARCHAR2(100) UNIQUE NOT NULL,
+Phone VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Product (
+Product_ID NUMBER PRIMARY KEY,
+Product_Name VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0),
+Stock NUMBER CHECK (Stock &gt;= 0)
+);
+CREATE TABLE Order_Details (
+Order_ID NUMBER PRIMARY KEY,
+Customer_ID NUMBER,
+Product_ID NUMBER,
+Order_Date DATE NOT NULL,
+Quantity NUMBER CHECK (Quantity &gt; 0),
+FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
+FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
+);
+-- Sample data
+INSERT INTO Customer VALUES (1, 'Alice Johnson', 'alice@email.com', '555-1234');
+INSERT INTO Customer VALUES (2, 'Bob Smith', 'bob@email.com', '555-5678');
+INSERT INTO Product VALUES (1, 'Laptop', 120, 50);
+INSERT INTO Product VALUES (2, 'Mouse', 80, 100);
+INSERT INTO Product VALUES (3, 'Keyboard', 90, 75);
+INSERT INTO Order_Details VALUES (1, 1, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'), 2);
+INSERT INTO Order_Details VALUES (2, 1, 2, TO_DATE('2024-02-15', 'YYYY-MM-DD'), 5);
+INSERT INTO Order_Details VALUES (3, 2, 1, TO_DATE('2024-03-20', 'YYYY-MM-DD'), 1);
+COMMIT;
+SET 11: Customer-Product-Order_Details
+Question 1: Schema Creation and Queries
+Create Tables
+SELECT *
+FROM Customer;
+SELECT p.Product_Name, SUM(od.Quantity) AS Total_Quantity
+FROM Product p
+JOIN Order_Details od ON p.Product_ID = od.Product_ID
+GROUP BY p.Product_Name;
+SELECT Product_ID
+FROM Product
+WHERE Price &gt; 100
+INTERSECT
+SELECT Product_ID
+FROM Order_Details;
+-- 1. Uppercase customer names
+SELECT UPPER(Name) AS Uppercase_Name
+FROM Customer;
+-- 2. Length of product name
+SELECT Product_Name, LENGTH(Product_Name) AS Name_Length
+FROM Product;
+-- 3. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+greatest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+greatest := num1;
+ELSIF num2 &gt;= num1 AND num2 &gt;= num3 THEN
+greatest := num2;
+ELSE
+greatest := num3;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The greatest number is: ' || greatest);
+END;
+/
+Query 1: Retrieve all customers
+Query 2: Total quantity per product
+Query 3: INTERSECT products
+Question 2: Functions
+Question 3: Greatest of Three Numbers
+DECLARE
+negative_age EXCEPTION;
+v_age NUMBER := &amp;input_age;
+BEGIN
+IF v_age &lt; 0 THEN
+RAISE negative_age;
+ELSE
+DBMS_OUTPUT.PUT_LINE('Valid age: ' || v_age);
+END IF;
+EXCEPTION
+WHEN negative_age THEN
+DBMS_OUTPUT.PUT_LINE('Error: Age cannot be negative');
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE('An unexpected error occurred');
+END;
+/
+CREATE TABLE Student (
+Student_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+DOB DATE NOT NULL,
+Department VARCHAR2(50) NOT NULL
+);
+CREATE TABLE Course (
+Course_ID NUMBER PRIMARY KEY,
+Course_Name VARCHAR2(100) NOT NULL,
+Credits NUMBER CHECK (Credits &gt; 0)
+);
+CREATE TABLE Enrollment (
+Enrollment_ID NUMBER PRIMARY KEY,
+Student_ID NUMBER,
+Course_ID NUMBER,
+Enrollment_Date DATE NOT NULL,
+FOREIGN KEY (Student_ID) REFERENCES Student(Student_ID),
+FOREIGN KEY (Course_ID) REFERENCES Course(Course_ID)
+);
+-- Sample data
+INSERT INTO Student VALUES (101, 'John Doe', TO_DATE('2000-05-15', 'YYYY-MM-DD'), 'Computer
+INSERT INTO Student VALUES (102, 'Jane Smith', TO_DATE('1999-08-20', 'YYYY-MM-DD'), 'Mathem
+INSERT INTO Student VALUES (103, 'Bob Johnson', TO_DATE('2001-03-10', 'YYYY-MM-DD'), 'Physi
+INSERT INTO Course VALUES (1, 'Database Systems', 4);
+INSERT INTO Course VALUES (2, 'Algorithms', 3);
+INSERT INTO Course VALUES (3, 'Data Structures', 4);
+INSERT INTO Enrollment VALUES (1, 101, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'));
+INSERT INTO Enrollment VALUES (2, 102, 2, TO_DATE('2024-01-15', 'YYYY-MM-DD'));
+INSERT INTO Enrollment VALUES (3, 101, 2, TO_DATE('2024-02-20', 'YYYY-MM-DD'));
+Question 4: User-Defined Exception
+SET 12: Student-Course-Enrollment
+Question 1: Schema Creation and Queries
+Create Tables
+COMMIT;
+SELECT s.Name
+FROM Student s
+JOIN Enrollment e ON s.Student_ID = e.Student_ID
+WHERE e.Course_ID = 1;
+UPDATE Student
+SET Department = 'Computer Science'
+WHERE Student_ID = 101;
+COMMIT;
+SELECT s.Name
+FROM Student s
+WHERE s.Student_ID IN (
+SELECT Student_ID
+FROM Enrollment
+GROUP BY Student_ID
+HAVING COUNT(Course_ID) &gt; 3
+);
+-- 1. Lowercase student names
+SELECT LOWER(Name) AS Lowercase_Name
+FROM Student;
+-- 2. Day of week from enrollment date
+SELECT Enrollment_Date, TO_CHAR(Enrollment_Date, 'DAY') AS Day_Of_Week
+FROM Enrollment;
+-- 3. Add 7 days
+SELECT Enrollment_Date, Enrollment_Date + 7 AS Date_Plus_7_Days
+FROM Enrollment;
+DECLARE
+total NUMBER := 0;
+i NUMBER;
+BEGIN
+FOR i IN 1..100 LOOP
+IF MOD(i, 2) = 0 THEN
+total := total + i;
+END IF;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of even numbers from 1 to 100: ' || total);
+Query 1: Students enrolled in Course 1
+Query 2: Update department
+Query 3: Students enrolled in > 3 courses
+Question 2: Functions
+Question 3: Summation of Even Numbers Using FOR LOOP
+END;
+/
+CREATE OR REPLACE TRIGGER Student_Age_Check
+BEFORE INSERT OR UPDATE ON Student
+FOR EACH ROW
+DECLARE
+v_age NUMBER;
+BEGIN
+v_age := FLOOR(MONTHS_BETWEEN(SYSDATE, :NEW.DOB) / 12);
+IF v_age &lt; 16 THEN
+RAISE_APPLICATION_ERROR(-20005, 'Student must be at least 16 years old');
+ELSIF v_age &gt; 100 THEN
+RAISE_APPLICATION_ERROR(-20006, 'Invalid age: Age exceeds 100 years');
+END IF;
+END;
+/
+-- Test
+INSERT INTO Student VALUES (104, 'Test Student', TO_DATE('2015-01-01', 'YYYY-MM-DD'), 'CS')
+CREATE TABLE Library_Members (
+Member_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Email VARCHAR2(100) UNIQUE NOT NULL,
+Phone VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Books (
+Book_ID NUMBER PRIMARY KEY,
+Title VARCHAR2(200) NOT NULL,
+Author VARCHAR2(100) NOT NULL,
+Copies_Available NUMBER CHECK (Copies_Available &gt;= 0)
+);
+CREATE TABLE Borrow_Details (
+Transaction_ID NUMBER PRIMARY KEY,
+Member_ID NUMBER,
+Book_ID NUMBER,
+Borrow_Date DATE NOT NULL,
+Return_Date DATE,
+FOREIGN KEY (Member_ID) REFERENCES Library_Members(Member_ID),
+FOREIGN KEY (Book_ID) REFERENCES Books(Book_ID)
+);
+-- Sample data
+INSERT INTO Library_Members VALUES (1, 'Tom Harris', 'tom@email.com', '555-1111');
+INSERT INTO Library_Members VALUES (2, 'Sarah Lee', 'sarah@email.com', '555-2222');
+INSERT INTO Library_Members VALUES (102, 'Mike Brown', 'mike@email.com', '555-3333');
+INSERT INTO Books VALUES (1, 'The Great Gatsby', 'F. Scott Fitzgerald', 5);
+Question 4: Student Age Validation Trigger
+SET 13: Library_Members-Books-Borrow_Details
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Books VALUES (2, 'To Kill a Mockingbird', 'Harper Lee', 3);
+INSERT INTO Books VALUES (3, '1984', 'George Orwell', 4);
+INSERT INTO Borrow_Details VALUES (1, 1, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'), NULL);
+INSERT INTO Borrow_Details VALUES (2, 2, 2, TO_DATE('2024-02-15', 'YYYY-MM-DD'), TO_DATE('2
+COMMIT;
+SELECT DISTINCT lm.Name
+FROM Library_Members lm
+JOIN Borrow_Details bd ON lm.Member_ID = bd.Member_ID
+JOIN Books b ON bd.Book_ID = b.Book_ID
+WHERE b.Title = 'The Great Gatsby';
+SELECT Title, Copies_Available AS Total_Copies
+FROM Books
+ORDER BY Copies_Available ASC;
+UPDATE Library_Members
+SET Phone = '123-456-7890'
+WHERE Member_ID = 102;
+COMMIT;
+-- 1. Uppercase member names
+SELECT UPPER(Name) AS Uppercase_Name
+FROM Library_Members;
+-- 2. Substring of title (first 10 characters)
+SELECT Title, SUBSTR(Title, 1, 10) AS Title_Substring
+FROM Books;
+-- 3. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+num NUMBER := &amp;input_number;
+BEGIN
+IF num &gt; 0 THEN
+DBMS_OUTPUT.PUT_LINE('The number is positive');
+ELSIF num &lt; 0 THEN
+DBMS_OUTPUT.PUT_LINE('The number is negative');
+ELSE
+DBMS_OUTPUT.PUT_LINE('The number is zero');
+END IF;
+END;
+/
+Query 1: Members who borrowed 'The Great Gatsby'
+Query 2: Total copies per book
+Query 3: Update phone number
+Question 2: Functions
+Question 3: Check Number Sign
+CREATE OR REPLACE PROCEDURE GCD_Procedure(num1 IN NUMBER, num2 IN NUMBER) IS
+a NUMBER := num1;
+b NUMBER := num2;
+temp NUMBER;
+gcd NUMBER;
+BEGIN
+WHILE b != 0 LOOP
+temp := b;
+b := MOD(a, b);
+a := temp;
+END LOOP;
+gcd := a;
+DBMS_OUTPUT.PUT_LINE('GCD of ' || num1 || ' and ' || num2 || ' is: ' || gcd);
+END;
+/
+-- Execute
+BEGIN
+GCD_Procedure(84, 36);
+END;
+/
+CREATE TABLE Supplier (
+Supplier_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Contact VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Inventory (
+Inventory_ID NUMBER PRIMARY KEY,
+Item_Name VARCHAR2(200) NOT NULL,
+Supplier_ID NUMBER,
+Quantity NUMBER CHECK (Quantity &gt;= 0),
+FOREIGN KEY (Supplier_ID) REFERENCES Supplier(Supplier_ID)
+);
+CREATE TABLE Sales (
+Sale_ID NUMBER PRIMARY KEY,
+Inventory_ID NUMBER,
+Sale_Date DATE NOT NULL,
+Sold_Quantity NUMBER CHECK (Sold_Quantity &gt; 0),
+FOREIGN KEY (Inventory_ID) REFERENCES Inventory(Inventory_ID)
+);
+-- Sample data
+INSERT INTO Supplier VALUES (1, 'ABC Suppliers', '555-1111');
+INSERT INTO Supplier VALUES (2, 'XYZ Trading', '555-2222');
+INSERT INTO Supplier VALUES (5, 'Global Vendors', '555-3333');
+INSERT INTO Inventory VALUES (1, 'Laptop', 1, 150);
+INSERT INTO Inventory VALUES (2, 'Monitor', 2, 200);
+INSERT INTO Inventory VALUES (3, 'Keyboard', 1, 120);
+Question 4: GCD Procedure
+SET 14: Supplier-Inventory-Sales
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Sales VALUES (1, 1, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 30);
+INSERT INTO Sales VALUES (2, 2, TO_DATE('2024-02-20', 'YYYY-MM-DD'), 45);
+INSERT INTO Sales VALUES (3, 1, TO_DATE('2024-03-10', 'YYYY-MM-DD'), 25);
+COMMIT;
+SELECT DISTINCT s.Name
+FROM Supplier s
+JOIN Inventory i ON s.Supplier_ID = i.Supplier_ID
+WHERE i.Quantity &gt; 100;
+SELECT i.Item_Name, SUM(s.Sold_Quantity) AS Total_Sold
+FROM Inventory i
+JOIN Sales s ON i.Inventory_ID = s.Inventory_ID
+GROUP BY i.Item_Name
+ORDER BY Total_Sold DESC;
+UPDATE Supplier
+SET Contact = '987-654-3210'
+WHERE Supplier_ID = 5;
+COMMIT;
+-- 1. Lowercase supplier names
+SELECT LOWER(Name) AS Lowercase_Name
+FROM Supplier;
+-- 2. Extract year from sale date
+SELECT Sale_Date, TO_CHAR(Sale_Date, 'YYYY') AS Sale_Year
+FROM Sales;
+-- 3. Add 30 days
+SELECT Sale_Date, Sale_Date + 30 AS Date_Plus_30_Days
+FROM Sales;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+sum_result NUMBER;
+BEGIN
+sum_result := num1 + num2;
+DBMS_OUTPUT.PUT_LINE('Sum of ' || num1 || ' and ' || num2 || ' is: ' || sum_result);
+END;
+/
+Query 1: Suppliers with items quantity > 100
+Query 2: Total quantity sold per item
+Query 3: Update contact
+Question 2: Functions
+Question 3: Addition of Two Numbers
+CREATE OR REPLACE PROCEDURE Calculate_Product(
+a IN NUMBER,
+b IN NUMBER,
+result OUT NUMBER
+) IS
+BEGIN
+result := a * b;
+DBMS_OUTPUT.PUT_LINE('Product of ' || a || ' and ' || b || ' is: ' || result);
+END;
+/
+-- Execute using positional parameters
+DECLARE
+product NUMBER;
+BEGIN
+Calculate_Product(15, 7, product);
+END;
+/
+CREATE TABLE Employees (
+Employee_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Position VARCHAR2(50) NOT NULL,
+Salary NUMBER CHECK (Salary &gt; 0)
+);
+CREATE TABLE Departments (
+Department_ID NUMBER PRIMARY KEY,
+Department_Name VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Employee_Department (
+Employee_ID NUMBER,
+Department_ID NUMBER,
+Start_Date DATE NOT NULL,
+FOREIGN KEY (Employee_ID) REFERENCES Employees(Employee_ID),
+FOREIGN KEY (Department_ID) REFERENCES Departments(Department_ID)
+);
+-- Sample data
+INSERT INTO Employees VALUES (101, 'Alice Cooper', 'Sales Rep', 48000);
+INSERT INTO Employees VALUES (102, 'Bob Dylan', 'Manager', 52000);
+INSERT INTO Employees VALUES (103, 'Charlie Parker', 'Sales Rep', 47000);
+INSERT INTO Departments VALUES (1, 'Sales');
+INSERT INTO Departments VALUES (2, 'Marketing');
+INSERT INTO Departments VALUES (3, 'IT');
+INSERT INTO Employee_Department VALUES (101, 1, TO_DATE('2020-01-15', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (102, 2, TO_DATE('2019-06-10', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (103, 1, TO_DATE('2021-03-20', 'YYYY-MM-DD'));
+Question 4: Positional Parameters Procedure
+SET 15: Employees-Departments (Extended)
+Question 1: Schema Creation and Queries
+Create Tables
+COMMIT;
+SELECT e.Name, e.Position
+FROM Employees e
+JOIN Employee_Department ed ON e.Employee_ID = ed.Employee_ID
+JOIN Departments d ON ed.Department_ID = d.Department_ID
+WHERE d.Department_Name = 'Sales';
+UPDATE Employees
+SET Salary = 55000
+WHERE Employee_ID = 102;
+COMMIT;
+SELECT e.Name
+FROM Employees e
+WHERE e.Employee_ID NOT IN (
+SELECT Employee_ID
+FROM Employee_Department
+);
+-- 1. Uppercase positions
+SELECT UPPER(Position) AS Uppercase_Position
+FROM Employees;
+-- 2. Length of department name
+SELECT Department_Name, LENGTH(Department_Name) AS Name_Length
+FROM Departments;
+-- 3. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+greatest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+greatest := num1;
+ELSIF num2 &gt;= num1 AND num2 &gt;= num3 THEN
+greatest := num2;
+ELSE
+greatest := num3;
+END IF;
+Query 1: Employees in Sales department
+Query 2: Update salary for Employee 102
+Query 3: Employees not assigned to any department
+Question 2: Functions
+Question 3: Greatest of Three Numbers
+DBMS_OUTPUT.PUT_LINE('The greatest number is: ' || greatest);
+END;
+/
+DECLARE
+v_salary NUMBER;
+insufficient_salary EXCEPTION;
+BEGIN
+SELECT Salary INTO v_salary
+FROM Employees
+WHERE Employee_ID = 101;
+IF v_salary &lt; 50000 THEN
+RAISE insufficient_salary;
+ELSE
+DBMS_OUTPUT.PUT_LINE('Salary is acceptable: ' || v_salary);
+END IF;
+EXCEPTION
+WHEN insufficient_salary THEN
+DBMS_OUTPUT.PUT_LINE('Error: Salary is below minimum threshold');
+WHEN NO_DATA_FOUND THEN
+DBMS_OUTPUT.PUT_LINE('Error: Employee not found');
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE('An unexpected error occurred');
+END;
+/
+CREATE TABLE Customers (
+Customer_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Email VARCHAR2(100) UNIQUE NOT NULL
+);
+CREATE TABLE Products (
+Product_ID NUMBER PRIMARY KEY,
+Product_Name VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0)
+);
+CREATE TABLE Orders (
+Order_ID NUMBER PRIMARY KEY,
+Customer_ID NUMBER,
+Product_ID NUMBER,
+Order_Date DATE NOT NULL,
+FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID),
+FOREIGN KEY (Product_ID) REFERENCES Products(Product_ID)
+);
+-- Sample data
+INSERT INTO Customers VALUES (1, 'Emily Davis', 'emily@email.com');
+INSERT INTO Customers VALUES (2, 'Frank Miller', 'frank@email.com');
+INSERT INTO Customers VALUES (3, 'Grace Wilson', 'grace@email.com');
+Question 4: Raising Exception
+SET 16: Customers-Products-Orders (Extended)
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Products VALUES (1, 'Laptop', 45);
+INSERT INTO Products VALUES (2, 'Desktop', 120);
+INSERT INTO Products VALUES (3, 'Tablet', 85);
+INSERT INTO Orders VALUES (1, 1, 2, TO_DATE('2024-01-10', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (2, 2, 3, TO_DATE('2024-02-15', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (3, 1, 3, TO_DATE('2024-03-20', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (4, 3, 1, TO_DATE('2024-04-05', 'YYYY-MM-DD'));
+COMMIT;
+SELECT DISTINCT c.Name, c.Email
+FROM Customers c
+JOIN Orders o ON c.Customer_ID = o.Customer_ID;
+SELECT p.Product_Name, COUNT(o.Order_ID) AS Total_Orders
+FROM Products p
+JOIN Orders o ON p.Product_ID = o.Product_ID
+GROUP BY p.Product_Name
+ORDER BY Total_Orders DESC;
+SELECT Product_ID
+FROM Products
+WHERE Price &gt; 30
+INTERSECT
+SELECT Product_ID
+FROM Orders;
+-- 1. Uppercase product names
+SELECT UPPER(Product_Name) AS Uppercase_Name
+FROM Products;
+-- 2. Extract month from order date
+SELECT Order_Date, TO_CHAR(Order_Date, 'MONTH') AS Order_Month
+FROM Orders;
+-- 3. Length of email
+SELECT Email, LENGTH(Email) AS Email_Length
+FROM Customers;
+DECLARE
+total NUMBER := 0;
+i NUMBER;
+BEGIN
+FOR i IN 1..100 LOOP
+Query 1: Customers who placed orders
+Query 2: Total orders per product
+Query 3: INTERSECT products
+Question 2: Functions
+Question 3: Sum of Odd Numbers Using FOR LOOP
+IF MOD(i, 2) != 0 THEN
+total := total + i;
+END IF;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of odd numbers from 1 to 100: ' || total);
+END;
+/
+ALTER TABLE Customers ADD Age NUMBER;
+CREATE OR REPLACE TRIGGER Customer_Age_Check
+BEFORE INSERT OR UPDATE ON Customers
+FOR EACH ROW
+BEGIN
+IF :NEW.Age IS NOT NULL THEN
+IF :NEW.Age &lt; 18 THEN
+RAISE_APPLICATION_ERROR(-20007, 'Customer must be at least 18 years old');
+ELSIF :NEW.Age &gt; 120 THEN
+RAISE_APPLICATION_ERROR(-20008, 'Invalid age: Age exceeds 120 years');
+END IF;
+END IF;
+END;
+/
+-- Test
+INSERT INTO Customers VALUES (4, 'Test Customer', 'test@email.com', 15);
+CREATE TABLE Products (
+Product_ID NUMBER PRIMARY KEY,
+Product_Name VARCHAR2(200) NOT NULL,
+Category VARCHAR2(50) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0)
+);
+CREATE TABLE Sales (
+Sale_ID NUMBER PRIMARY KEY,
+Product_ID NUMBER,
+Sale_Date DATE NOT NULL,
+Quantity_Sold NUMBER CHECK (Quantity_Sold &gt; 0),
+FOREIGN KEY (Product_ID) REFERENCES Products(Product_ID)
+);
+CREATE TABLE Customers (
+Customer_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Email VARCHAR2(100) UNIQUE NOT NULL
+);
+-- Sample data
+INSERT INTO Products VALUES (1, 'Laptop', 'Electronics', 150);
+INSERT INTO Products VALUES (2, 'Smartphone', 'Electronics', 120);
+Question 4: Customer Age Validation Trigger
+SET 17: Products-Sales-Customers
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Products VALUES (3, 'Desk Chair', 'Furniture', 80);
+INSERT INTO Products VALUES (4, 'Monitor', 'Electronics', 90);
+INSERT INTO Sales VALUES (1, 1, TO_DATE('2024-01-15', 'YYYY-MM-DD'), 10);
+INSERT INTO Sales VALUES (2, 2, TO_DATE('2024-02-20', 'YYYY-MM-DD'), 15);
+INSERT INTO Sales VALUES (3, 4, TO_DATE('2024-03-10', 'YYYY-MM-DD'), 8);
+INSERT INTO Customers VALUES (1, 'John Anderson', 'john@email.com');
+INSERT INTO Customers VALUES (2, 'Mary Johnson', 'mary@email.com');
+COMMIT;
+SELECT Name
+FROM Customers;
+SELECT p.Product_Name, SUM(p.Price * s.Quantity_Sold) AS Total_Sales
+FROM Products p
+JOIN Sales s ON p.Product_ID = s.Product_ID
+GROUP BY p.Product_Name
+ORDER BY Total_Sales DESC;
+SELECT Product_Name
+FROM Products
+WHERE Product_ID NOT IN (
+SELECT Product_ID
+FROM Sales
+);
+-- 1. Uppercase product names
+SELECT UPPER(Product_Name) AS Uppercase_Name
+FROM Products;
+-- 2. Extract year from sale date
+SELECT Sale_Date, TO_CHAR(Sale_Date, 'YYYY') AS Sale_Year
+FROM Sales;
+-- 3. Round price to 2 decimal places
+SELECT Product_Name, ROUND(Price, 2) AS Rounded_Price
+FROM Products;
+DECLARE
+num NUMBER := &amp;input_number;
+BEGIN
+IF MOD(num, 2) = 0 THEN
+DBMS_OUTPUT.PUT_LINE('The number ' || num || ' is even');
+ELSE
+Query 1: Customers who made purchases
+Query 2: Total sales per product
+Query 3: Products never sold
+Question 2: Functions
+Question 3: Check Even or Odd
+DBMS_OUTPUT.PUT_LINE('The number ' || num || ' is odd');
+END IF;
+END;
+/
+CREATE OR REPLACE PROCEDURE Calculate_Rectangle_Area(
+length IN NUMBER,
+width IN NUMBER,
+area OUT NUMBER
+) IS
+BEGIN
+area := length * width;
+DBMS_OUTPUT.PUT_LINE('Area of rectangle with length ' || length ||
+' and width ' || width || ' is: ' || area);
+END;
+/
+-- Execute using named notation
+DECLARE
+rect_area NUMBER;
+BEGIN
+Calculate_Rectangle_Area(length =&gt; 12, width =&gt; 8, area =&gt; rect_area);
+END;
+/
+CREATE TABLE Employees (
+Employee_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Designation VARCHAR2(50) NOT NULL,
+Salary NUMBER CHECK (Salary &gt; 0)
+);
+CREATE TABLE Departments (
+Department_ID NUMBER PRIMARY KEY,
+Department_Name VARCHAR2(100) NOT NULL
+);
+CREATE TABLE Employee_Department (
+Employee_ID NUMBER,
+Department_ID NUMBER,
+Start_Date DATE NOT NULL,
+FOREIGN KEY (Employee_ID) REFERENCES Employees(Employee_ID),
+FOREIGN KEY (Department_ID) REFERENCES Departments(Department_ID)
+);
+-- Sample data
+INSERT INTO Employees VALUES (101, 'Tom Anderson', 'Engineer', 60000);
+INSERT INTO Employees VALUES (102, 'Sarah Williams', 'Manager', 75000);
+INSERT INTO Employees VALUES (103, 'Mike Brown', 'Analyst', 52000);
+INSERT INTO Employees VALUES (104, 'Lisa Davis', 'Developer', 48000);
+INSERT INTO Employees VALUES (105, 'David Wilson', 'Tester', 45000);
+Question 4: Notational Parameters Procedure
+SET 18: Employees-Departments-Employee_Department (Complex)
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Departments VALUES (1, 'Engineering');
+INSERT INTO Departments VALUES (2, 'Management');
+INSERT INTO Employee_Department VALUES (101, 1, TO_DATE('2021-01-15', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (102, 2, TO_DATE('2020-03-20', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (103, 1, TO_DATE('2023-11-01', 'YYYY-MM-DD'));
+INSERT INTO Employee_Department VALUES (105, 1, TO_DATE('2023-10-01', 'YYYY-MM-DD'));
+COMMIT;
+SELECT Name, Designation
+FROM Employees
+WHERE Salary &gt; 50000;
+UPDATE Employees
+SET Salary = 75000
+WHERE Employee_ID = 105;
+COMMIT;
+DELETE FROM Employee_Department
+WHERE Start_Date &gt; ADD_MONTHS(SYSDATE, -12);
+COMMIT;
+-- 1. Lowercase employee names
+SELECT LOWER(Name) AS Lowercase_Name
+FROM Employees;
+-- 2. Length of designation
+SELECT Designation, LENGTH(Designation) AS Designation_Length
+FROM Employees;
+-- 3. Current system date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+DECLARE
+num1 NUMBER := &amp;first_number;
+num2 NUMBER := &amp;second_number;
+num3 NUMBER := &amp;third_number;
+highest NUMBER;
+BEGIN
+IF num1 &gt;= num2 AND num1 &gt;= num3 THEN
+highest := num1;
+ELSIF num2 &gt;= num1 AND num2 &gt;= num3 THEN
+highest := num2;
+ELSE
+Query 1: Employees earning > 50000
+Query 2: Update salary for Employee 105
+Query 3: Delete employees assigned < 1 year
+Question 2: Functions
+Question 3: Highest of Three Numbers
+highest := num3;
+END IF;
+DBMS_OUTPUT.PUT_LINE('The highest number is: ' || highest);
+END;
+/
+DECLARE
+v_name Employees.Name%TYPE;
+v_emp_id NUMBER := &amp;employee_id;
+BEGIN
+SELECT Name INTO v_name
+FROM Employees
+WHERE Employee_ID = v_emp_id;
+DBMS_OUTPUT.PUT_LINE('Employee Name: ' || v_name);
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+DBMS_OUTPUT.PUT_LINE('Error: No employee found with ID ' || v_emp_id);
+WHEN TOO_MANY_ROWS THEN
+DBMS_OUTPUT.PUT_LINE('Error: Multiple employees found');
+WHEN OTHERS THEN
+DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END;
+/
+CREATE TABLE Customers (
+Customer_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+Phone VARCHAR2(20) NOT NULL
+);
+CREATE TABLE Products (
+Product_ID NUMBER PRIMARY KEY,
+Product_Name VARCHAR2(200) NOT NULL,
+Price NUMBER CHECK (Price &gt; 0)
+);
+CREATE TABLE Orders (
+Order_ID NUMBER PRIMARY KEY,
+Customer_ID NUMBER,
+Product_ID NUMBER,
+Order_Date DATE NOT NULL,
+FOREIGN KEY (Customer_ID) REFERENCES Customers(Customer_ID),
+FOREIGN KEY (Product_ID) REFERENCES Products(Product_ID)
+);
+-- Sample data
+INSERT INTO Customers VALUES (1, 'Alice Johnson', '555-1111');
+INSERT INTO Customers VALUES (2, 'Bob Miller', '555-2222');
+INSERT INTO Customers VALUES (3, 'Charlie Davis', '555-3333');
+Question 4: Pre-defined Exceptions
+SET 19: Customers-Products-Orders (Sales)
+Question 1: Schema Creation and Queries
+Create Tables
+INSERT INTO Products VALUES (1, 'Laptop', 150);
+INSERT INTO Products VALUES (2, 'Tablet', 90);
+INSERT INTO Products VALUES (3, 'Smartphone', 120);
+INSERT INTO Orders VALUES (1, 1, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (2, 2, 3, TO_DATE('2024-02-15', 'YYYY-MM-DD'));
+INSERT INTO Orders VALUES (3, 1, 2, TO_DATE('2022-12-20', 'YYYY-MM-DD'));
+COMMIT;
+SELECT DISTINCT c.Name
+FROM Customers c
+JOIN Orders o ON c.Customer_ID = o.Customer_ID
+JOIN Products p ON o.Product_ID = p.Product_ID
+WHERE p.Price &gt; 100;
+SELECT c.Name, SUM(p.Price) AS Total_Price
+FROM Customers c
+JOIN Orders o ON c.Customer_ID = o.Customer_ID
+JOIN Products p ON o.Product_ID = p.Product_ID
+GROUP BY c.Name
+ORDER BY Total_Price DESC;
+DELETE FROM Orders
+WHERE Order_Date &lt; TO_DATE('2023-01-01', 'YYYY-MM-DD');
+COMMIT;
+-- 1. Round prices to 2 decimal places
+SELECT Product_Name, ROUND(Price, 2) AS Rounded_Price
+FROM Products;
+-- 2. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 3. Uppercase product names
+SELECT UPPER(Product_Name) AS Uppercase_Name
+FROM Products;
+DECLARE
+total NUMBER := 0;
+i NUMBER := 1;
+BEGIN
+LOOP
+IF MOD(i, 2) != 0 THEN
+total := total + i;
+END IF;
+Query 1: Customers with orders > 100
+Query 2: Total price per customer
+Query 3: Delete orders before Jan 1, 2023
+Question 2: Functions
+Question 3: Sum of Odd Numbers Using Loop
+i := i + 1;
+EXIT WHEN i &gt; 100;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE('Sum of odd numbers from 1 to 100: ' || total);
+END;
+/
+CREATE OR REPLACE PROCEDURE Display_Employees_Cursor IS
+CURSOR emp_cursor IS
+SELECT Employee_ID, Name, Salary
+FROM Employees
+WHERE Salary &gt; 50000;
+v_emp_id Employees.Employee_ID%TYPE;
+v_name Employees.Name%TYPE;
+v_salary Employees.Salary%TYPE;
+BEGIN
+OPEN emp_cursor;
+LOOP
+FETCH emp_cursor INTO v_emp_id, v_name, v_salary;
+EXIT WHEN emp_cursor%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE('ID: ' || v_emp_id || ', Name: ' || v_name ||
+', Salary: ' || v_salary);
+END LOOP;
+CLOSE emp_cursor;
+END;
+/
+-- Execute
+BEGIN
+Display_Employees_Cursor;
+END;
+/
+CREATE TABLE Students (
+Student_ID NUMBER PRIMARY KEY,
+Name VARCHAR2(100) NOT NULL,
+DOB DATE NOT NULL
+);
+CREATE TABLE Courses (
+Course_ID NUMBER PRIMARY KEY,
+Course_Name VARCHAR2(100) NOT NULL,
+Credits NUMBER CHECK (Credits &gt; 0)
+);
+CREATE TABLE Enrollments (
+Enrollment_ID NUMBER PRIMARY KEY,
+Question 4: Cursor Implementation Procedure
+SET 20: Students-Courses-Enrollments
+Question 1: Schema Creation and Queries
+Create Tables
+Student_ID NUMBER,
+Course_ID NUMBER,
+Enrollment_Date DATE NOT NULL,
+FOREIGN KEY (Student_ID) REFERENCES Students(Student_ID),
+FOREIGN KEY (Course_ID) REFERENCES Courses(Course_ID)
+);
+-- Sample data
+INSERT INTO Students VALUES (1, 'Emma Wilson', TO_DATE('2002-03-15', 'YYYY-MM-DD'));
+INSERT INTO Students VALUES (2, 'Liam Brown', TO_DATE('2001-07-20', 'YYYY-MM-DD'));
+INSERT INTO Students VALUES (3, 'Olivia Davis', TO_DATE('2003-11-10', 'YYYY-MM-DD'));
+INSERT INTO Courses VALUES (1, 'Mathematics', 4);
+INSERT INTO Courses VALUES (2, 'Physics', 4);
+INSERT INTO Courses VALUES (3, 'Chemistry', 3);
+INSERT INTO Courses VALUES (4, 'Biology', 2);
+INSERT INTO Enrollments VALUES (1, 1, 1, TO_DATE('2024-01-10', 'YYYY-MM-DD'));
+INSERT INTO Enrollments VALUES (2, 1, 2, TO_DATE('2024-01-15', 'YYYY-MM-DD'));
+INSERT INTO Enrollments VALUES (3, 2, 1, TO_DATE('2024-02-20', 'YYYY-MM-DD'));
+INSERT INTO Enrollments VALUES (4, 3, 3, TO_DATE('2023-12-15', 'YYYY-MM-DD'));
+COMMIT;
+SELECT DISTINCT s.Name
+FROM Students s
+JOIN Enrollments e ON s.Student_ID = e.Student_ID
+JOIN Courses c ON e.Course_ID = c.Course_ID
+WHERE c.Credits &gt; 3;
+DELETE FROM Enrollments
+WHERE Enrollment_Date &lt; TO_DATE('2024-01-01', 'YYYY-MM-DD');
+COMMIT;
+SELECT Student_ID
+FROM Enrollments
+WHERE Course_ID = (SELECT Course_ID FROM Courses WHERE Course_Name = 'Mathematics')
+INTERSECT
+SELECT Student_ID
+FROM Enrollments
+WHERE Course_ID = (SELECT Course_ID FROM Courses WHERE Course_Name = 'Physics');
+-- 1. Uppercase course names
+SELECT UPPER(Course_Name) AS Uppercase_Course
+FROM Courses;
+-- 2. Current date
+SELECT SYSDATE AS Current_Date FROM DUAL;
+-- 3. Length of student names
+Query 1: Students enrolled in courses with > 3 credits
+Query 2: Delete enrollments before Jan 1, 2024
+Query 3: Students enrolled in both Mathematics and Physics
+Question 2: Functions
+SELECT Name, LENGTH(Name) AS Name_Length
+FROM Students;
+DECLARE
+num NUMBER := &amp;input_number;
+is_prime BOOLEAN := TRUE;
+i NUMBER;
+BEGIN
+IF num &lt;= 1 THEN
+is_prime := FALSE;
+ELSE
+FOR i IN 2..FLOOR(SQRT(num)) LOOP
+IF MOD(num, i) = 0 THEN
+is_prime := FALSE;
+EXIT;
+END IF;
+END LOOP;
+END IF;
+IF is_prime THEN
+DBMS_OUTPUT.PUT_LINE(num || ' is a prime number');
+ELSE
+DBMS_OUTPUT.PUT_LINE(num || ' is not a prime number');
+END IF;
+END;
+/
+CREATE OR REPLACE PROCEDURE Explicit_Cursor_Demo IS
+CURSOR student_cursor IS
+SELECT s.Name, c.Course_Name, e.Enrollment_Date
+FROM Students s
+JOIN Enrollments e ON s.Student_ID = e.Student_ID
+JOIN Courses c ON e.Course_ID = c.Course_ID
+ORDER BY s.Name;
+v_name Students.Name%TYPE;
+v_course Courses.Course_Name%TYPE;
+v_date Enrollments.Enrollment_Date%TYPE;
+BEGIN
+OPEN student_cursor;
+DBMS_OUTPUT.PUT_LINE('Student Enrollment Details:');
+DBMS_OUTPUT.PUT_LINE('---------------------------');
+LOOP
+FETCH student_cursor INTO v_name, v_course, v_date;
+EXIT WHEN student_cursor%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE('Student: ' || v_name || ', Course: ' || v_course ||
+', Date: ' || TO_CHAR(v_date, 'DD-MM-YYYY'));
+END LOOP;
+CLOSE student_cursor;
+END;
+/
+-- Execute
+BEGIN
+Question 3: Check if Number is Prime
+Question 4: Explicit Cursor Procedure
+Explicit_Cursor_Demo;
+END;
+/
+This comprehensive document contains all 20 sets of DBMS lab exam questions with complete, runnable SQL and
+PL/SQL code.
+NOTES FOR EXECUTION
+1. Enable Output: Before running PL/SQL blocks, execute:
+SET SERVEROUTPUT ON;
+2. Substitute &variables: When running scripts with substitution variables (e.g., &amp;first_number), provide
+values when prompted.
+3. Commit Changes: Use COMMIT; after INSERT, UPDATE, or DELETE operations to save changes.
+4. Rollback: Use ROLLBACK; to undo uncommitted changes.
+5. View Triggers: Check triggers with:
+SELECT * FROM user_triggers;
+6. View Procedures: Check procedures with:
+SELECT * FROM user_procedures;
+7. View Functions: Check functions with:
+SELECT * FROM user_functions;
